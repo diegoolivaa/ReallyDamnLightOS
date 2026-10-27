@@ -62,7 +62,7 @@ GDT_DESCRIPTION:
 
 ProtectedMode:      ; SII SIAMO IN PROTECTED MODEE devo riinizializzare i puntatori ai segmenti giustamente
     [Bits 32]
-    MOV AX, 0x10
+    MOV AX, 0x18
     MOV DS, AX
     MOV ES, AX
     MOV SS, AX
@@ -76,9 +76,11 @@ ProtectedMode:      ; SII SIAMO IN PROTECTED MODEE devo riinizializzare i puntat
     XOR EAX, (1<<21); Controllo invertendo il 21 esimo bit del registro EFLAGS
     PUSH EAX
     POPFD
-
+    
+    PUSHFD
+    POP EAX
     CMP ECX, EAX
-    JNZ Uncompatible
+    JZ Uncompatible
 
     MOV EAX, 0x80000000 ; Chiediamo il limite delle funzioni estese
     CPUID
@@ -202,7 +204,7 @@ print_string_64:
         RET
 
 PM_MSG DB 'PM OK!', 0
-UNCOMPATIBLE_MSG DB 'You must have a 64-bit procesor in order to run ReallyDamnLightOS!', 0
+UNCOMPATIBLE_MSG DB 'You must have a 64-bit processor in order to run ReallyDamnLightOS!', 0
 LONG_MODE_MSG DB 'Welcome to Long Mode! Your Hardware is fully compatible with RDL OS', 0
 ; Siccome c'e' un problema di lettura settori...
 times 512-($-$$) db 0
