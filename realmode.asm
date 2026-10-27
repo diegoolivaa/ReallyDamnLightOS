@@ -59,14 +59,29 @@ ProtectedMode:      ; SII SIAMO IN PROTECTED MODEE devo riinizializzare i puntat
     MOV ES, AX
     MOV SS, AX
     MOV ESP, 0x90000
+    MOV ESI, PM_MSG
     CALL print_string
-    CALL ReadCode
+
+    PUSHFD          ; Qui c'e' il controllo CPUID. Se abbiamo processore 64 bit allora ok. Senno' stop!
+    POP EAX
+    MOV ECX, EAX
+    XOR EAX, (1<<21); Controllo invertendo il 21 esimo bit del registro EFLAGS
+    PUSH EAX
+    POPFD
+
+    CMP ECX, EAX
+    JNZ Uncompatible
+
+    MOV EAX, 0x80000000 ; Controllo funzioni estese 
+    CPUID
+    CMP EAX, 0x80000001 ; Ce le hai?
+    JB Uncompatible     ; Se e' piu' basso -> CPU troppo vecchia.
+
     JMP $
 
-print_string:       ; Funzione print!
-    PUSHAD          ; Pusha sullo stack tutti i registri a 16 bit general purpose
+print_string:        ; Funzione print!
+    PUSHAD           ; Pusha sullo stack tutti i registri a 16 bit general purpose
     MOV EBX, 0xB8000 ; Dove inizia la memoria VGA (reg BX in 16 bit)
-    MOV ESI, PM_MSG  ; Source Index, punta alla stringa
 .loop:
     MOV AL, [ESI]   ; Sposto in AL il carattere da leggere [ESI]
     CMP AL, 0       ; Se il carattere e' 0 done
@@ -80,17 +95,12 @@ print_string:       ; Funzione print!
     POPAD           ; Restore registers
     RET             ; Return to ProtectedMode
 
-ReadCode:
-    MOV EBX, 0xB8000
-.wait:
-    IN AL, 0x64
-    TEST AL, 1
-    JZ .wait
-    IN AL, 0x60
-    MOV AH, 0x0F
-    MOV [EBX], AX
-    RET
+Uncompatible:
+    MOV ESI, UNCOMPATIBLE_MSG
+    CALL print_string
+    JMP $
 
 PM_MSG DB 'PM OK!', 0
+UNCOMPATIBLE_MSG DB 'You must have a 64-bit procesor in order to run ReallyDamnLightOS!', 0
 ; Siccome c'e' un problema di lettura settori...
 times 512-($-$$) db 0

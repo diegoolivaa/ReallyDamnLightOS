@@ -1,0 +1,9 @@
+@echo off
+nasm -f bin boot.asm -o boot.bin
+nasm -f bin realmode.asm -o realmode.bin
+echo Compiling...
+sleep 1
+echo Creating os.img...
+sleep 1
+echo Starting Up...
+qemu-system-x86_64 -drive format=raw,file=os.img
