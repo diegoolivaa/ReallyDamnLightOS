@@ -1,5 +1,11 @@
 // Welcome to RDL OS's Kernel!
 
+void print(const char *s);      // annuncio, una riga sola
+
+void kmain(void) {
+    print("Yoo sta roba funzia");
+}
+
 // Printf function
 void print(const char *s) {
     volatile char *vgaAddress = (volatile char *)0xB8000;
@@ -9,8 +15,4 @@ void print(const char *s) {
         s++;
         vgaAddress += 2;        // In the assembly file it is ADD EBX, 2
     }
-}
-
-void kmain(void) {
-    print("Yoo sta roba funzia");
 }
