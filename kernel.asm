@@ -176,6 +176,9 @@ LongMode:
     MOV RSI, LONG_MODE_MSG
     CALL print_string_64
 
+    ; C func
+    CALL 0x8200
+
     JMP $
 
 print_string_64:
@@ -207,4 +210,4 @@ PM_MSG DB 'PM OK!', 0
 UNCOMPATIBLE_MSG DB 'You must have a 64-bit processor in order to run ReallyDamnLightOS!', 0
 LONG_MODE_MSG DB 'Welcome to Long Mode! Your Hardware is fully compatible with RDL OS', 0
 ; Siccome c'e' un problema di lettura settori...
-times 512-($-$$) db 0
+times 1024-($-$$) db 0
