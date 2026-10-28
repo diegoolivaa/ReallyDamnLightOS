@@ -41,7 +41,7 @@ MAIN:
     JC ERRORE
     
     MOV AH, 2H          ; Read
-    MOV AL, 3H          ; Settori da leggere
+    MOV AL, 4H          ; Settori da leggere
     MOV BX, 7E00H       ; ES:BX -> SEGMENT:OFFSET
     MOV CH, 0h          ; Old BIOS conventional HDD settings.
     MOV CL, 2H
